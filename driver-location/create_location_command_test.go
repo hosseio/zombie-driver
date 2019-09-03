@@ -23,7 +23,7 @@ func TestCreateLocationCommandHandler_Handle(t *testing.T) {
 				return nil
 			},
 		}
-		driverCreator := NewDriverCreator()
+		driverCreator := NewDriverBuilder()
 		sut := NewCreateLocationCommandHandler(driverViewMock, driverRepositoryMock, driverCreator)
 		t.Run("When it handles the create location command", func(t *testing.T) {
 			command := CreateLocationCommand{

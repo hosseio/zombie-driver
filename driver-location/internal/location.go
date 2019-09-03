@@ -12,7 +12,7 @@ type Location struct {
 
 type LocationList []Location
 
-func (l *LocationList) add(location Location) {
+func (l *LocationList) Add(location Location) {
 	*l = append([]Location(*l), location)
 }
 
@@ -54,3 +54,6 @@ func (l Location) Longitude() float64 {
 	return l.longitude
 }
 
+func (l Location) UpdatedAt() UpdatedAt {
+	return l.updatedAt
+}

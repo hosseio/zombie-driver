@@ -19,15 +19,15 @@ type CreateLocationCommand struct {
 type CreateLocationCommandHandler struct {
 	driverView       domain.DriverView
 	driverRepository domain.DriverRepository
-	driverCreator    DriverCreator
+	driverBuilder    DriverBuilder
 }
 
 func NewCreateLocationCommandHandler(
 	driverView domain.DriverView,
 	driverRepository domain.DriverRepository,
-	driverCreator DriverCreator,
+	driverBuilder DriverBuilder,
 ) CreateLocationCommandHandler {
-	return CreateLocationCommandHandler{driverView: driverView, driverRepository: driverRepository, driverCreator: driverCreator}
+	return CreateLocationCommandHandler{driverView: driverView, driverRepository: driverRepository, driverBuilder: driverBuilder}
 }
 
 func (h CreateLocationCommandHandler) Handle(command cromberbus.Command) error {
@@ -40,11 +40,12 @@ func (h CreateLocationCommandHandler) Handle(command cromberbus.Command) error {
 	if err != nil {
 		return err
 	}
-	at, err := domain.NewUpdatedAt(time.Now())
-	if err != nil {
-		return err
-	}
-	location, err := domain.NewLocation(createLocationCommand.Latitude, createLocationCommand.Longitude, at)
+
+	location, err := h.driverBuilder.BuildLocation(LocationBuilderDTO{
+		Latitude:  createLocationCommand.Latitude,
+		Longitude: createLocationCommand.Longitude,
+		UpdatedAt: time.Now(),
+	})
 	if err != nil {
 		return err
 	}
@@ -57,7 +58,7 @@ func (h CreateLocationCommandHandler) Handle(command cromberbus.Command) error {
 func (h CreateLocationCommandHandler) getDriver(driverID string) (domain.Driver, error) {
 	driver, err := h.driverView.ById(driverID)
 	if err != nil && err == domain.ErrDriverNotFound {
-		return h.driverCreator.Create(driverID)
+		return h.driverBuilder.Build(DriverBuilderDTO{DriverID: driverID})
 	}
 
 	return driver, err

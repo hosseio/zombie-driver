@@ -1,14 +1,22 @@
 package domain
 
 type Driver struct {
-	driverID DriverID
+	driverID  DriverID
 	locations LocationList
 }
 
-func NewDriver(driverID DriverID) (Driver, error) {
-	return Driver{driverID: driverID}, nil
+func NewDriver(driverID DriverID, locations LocationList) (Driver, error) {
+	return Driver{driverID, locations}, nil
 }
 
-func (d Driver) AddLocation(location Location)  {
-	d.locations.add(location)
+func (d Driver) AddLocation(location Location) {
+	d.locations.Add(location)
+}
+
+func (d Driver) Locations() LocationList {
+	return d.locations
+}
+
+func (d Driver) DriverID() DriverID {
+	return d.driverID
 }

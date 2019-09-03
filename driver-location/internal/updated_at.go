@@ -42,3 +42,7 @@ func (u UpdatedAt) validate() error {
 func (u UpdatedAt) Date() time.Time {
 	return u.date
 }
+
+func (u UpdatedAt) String() string {
+	return u.Date().Format(time.RFC3339)
+}
