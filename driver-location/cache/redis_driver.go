@@ -31,9 +31,9 @@ func NewRedisDriver(address string, driverBuilder driver_location.DriverBuilder)
 }
 
 type LocationDTO struct {
-	Latitude  float64 `json:"latitude"`
-	Longitude float64 `json:"longitude"`
-	UpdatedAt string  `json:"updated_at"` // date in RFC3330 format
+	Latitude  float64   `json:"latitude"`
+	Longitude float64   `json:"longitude"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 type DriverLocationDTO struct {
@@ -84,7 +84,7 @@ func (rd RedisDriver) entityToDTO(driver domain.Driver) DriverLocationDTO {
 		locationDTO := LocationDTO{
 			Latitude:  location.Latitude(),
 			Longitude: location.Longitude(),
-			UpdatedAt: location.UpdatedAt().String(),
+			UpdatedAt: location.UpdatedAt().Date(),
 		}
 		locationsDTO = append(locationsDTO, locationDTO)
 	}
@@ -98,14 +98,10 @@ func (rd RedisDriver) entityToDTO(driver domain.Driver) DriverLocationDTO {
 func (rd RedisDriver) dtoToEntity(dto DriverLocationDTO) (domain.Driver, error) {
 	locations := []driver_location.LocationBuilderDTO{}
 	for _, location := range dto.Locations {
-		updatedAt, err := time.Parse(time.RFC3339, location.UpdatedAt)
-		if err != nil {
-			return domain.Driver{}, err
-		}
 		locations = append(locations, driver_location.LocationBuilderDTO{
 			Latitude:  location.Latitude,
 			Longitude: location.Longitude,
-			UpdatedAt: updatedAt,
+			UpdatedAt: location.UpdatedAt,
 		})
 	}
 
