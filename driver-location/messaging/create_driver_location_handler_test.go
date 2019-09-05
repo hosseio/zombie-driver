@@ -22,12 +22,30 @@ func TestCreateDriverLocationConsumer(t *testing.T) {
 	topic := "topic_name"
 
 	var (
+		sut CreateDriverLocationHandler
+
+		consumer NsqConsumer
+		bus      *CommandBusMock
 		producer *nsq.Producer
+		syncChan chan bool
 	)
 
 	setup := func() {
 		config := nsq.NewConfig()
 		producer, _ = nsq.NewProducer(nsqAddress, config)
+
+		syncChan = make(chan bool, 0)
+		bus = &CommandBusMock{
+			DispatchFunc: func(command cromberbus.Command) error {
+				syncChan <- true
+				return nil
+			},
+		}
+
+		sut = NewCreateDriverLocationHandler(bus)
+		consumer = NewNsqConsumer(nsqAddress, topic, "ch", sut)
+
+		syncChan = make(chan bool, 0)
 	}
 
 	tearDown := func() {
@@ -38,16 +56,9 @@ func TestCreateDriverLocationConsumer(t *testing.T) {
 		setup()
 		defer tearDown()
 
-		bus := &CommandBusMock{
-			DispatchFunc: func(command cromberbus.Command) error {
-				return nil
-			},
-		}
-
-		sut := NewCreateDriverLocationHandler(bus)
-		consumer := NewNsqConsumer(nsqAddress, topic, "ch", sut)
+		ctx := context.Background()
 		go func() {
-			err := consumer.Run(context.Background())
+			err := consumer.Run(ctx)
 			assertThat.NoError(err)
 		}()
 		t.Run("When a create driver location message is sent to that topic", func(t *testing.T) {
@@ -62,6 +73,7 @@ func TestCreateDriverLocationConsumer(t *testing.T) {
 			err = producer.Publish(topic, bytes)
 			assertThat.NoError(err)
 			t.Run("Then the command bus dispatch a command", func(t *testing.T) {
+				<-syncChan
 				assertThat.True(len(bus.DispatchCalls()) > 0)
 			})
 		})
