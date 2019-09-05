@@ -3,6 +3,7 @@ package cache
 import (
 	"encoding/json"
 	"fmt"
+	"sort"
 	"time"
 
 	"github.com/heetch/jose-odg-technical-test/driver-location"
@@ -11,7 +12,10 @@ import (
 	"github.com/heetch/jose-odg-technical-test/driver-location/internal"
 )
 
-const prefix = "heetch.driver-location"
+const (
+	prefix     = "heetch.driver-location"
+	ttlInHours = 48
+)
 
 type RedisDriver struct {
 	client        redis.Pool
@@ -47,13 +51,13 @@ func (rd RedisDriver) Save(driver domain.Driver) error {
 
 	key := fmt.Sprintf("%s:%s", prefix, driver.DriverID().String())
 
-	driverLocationDTO := rd.entityToDTO(driver)
+	driverLocationDTO := rd.driverEntityToDTO(driver)
 	bytes, err := json.Marshal(driverLocationDTO)
 	if err != nil {
 		return err
 	}
 
-	_, err = conn.Do("SET", key, bytes)
+	_, err = conn.Do("SETEX", key, ttlInHours*3600, bytes)
 
 	return err
 }
@@ -75,18 +79,13 @@ func (rd RedisDriver) ById(id string) (domain.Driver, error) {
 		return domain.Driver{}, domain.ErrDriverNotFound
 	}
 
-	return rd.dtoToEntity(driverLocationDTO)
+	return rd.dtoToDriverEntity(driverLocationDTO)
 }
 
-func (rd RedisDriver) entityToDTO(driver domain.Driver) DriverLocationDTO {
+func (rd RedisDriver) driverEntityToDTO(driver domain.Driver) DriverLocationDTO {
 	locationsDTO := make([]LocationDTO, 0)
 	for _, location := range driver.Locations() {
-		locationDTO := LocationDTO{
-			Latitude:  location.Latitude(),
-			Longitude: location.Longitude(),
-			UpdatedAt: location.UpdatedAt().Date(),
-		}
-		locationsDTO = append(locationsDTO, locationDTO)
+		locationsDTO = append(locationsDTO, rd.locationEntityToDTO(location))
 	}
 
 	return DriverLocationDTO{
@@ -95,7 +94,15 @@ func (rd RedisDriver) entityToDTO(driver domain.Driver) DriverLocationDTO {
 	}
 }
 
-func (rd RedisDriver) dtoToEntity(dto DriverLocationDTO) (domain.Driver, error) {
+func (rd RedisDriver) locationEntityToDTO(location domain.Location) LocationDTO {
+	return LocationDTO{
+		Latitude:  location.Latitude(),
+		Longitude: location.Longitude(),
+		UpdatedAt: location.UpdatedAt().Date(),
+	}
+}
+
+func (rd RedisDriver) dtoToDriverEntity(dto DriverLocationDTO) (domain.Driver, error) {
 	locations := []driver_location.LocationBuilderDTO{}
 	for _, location := range dto.Locations {
 		locations = append(locations, driver_location.LocationBuilderDTO{
@@ -111,4 +118,22 @@ func (rd RedisDriver) dtoToEntity(dto DriverLocationDTO) (domain.Driver, error) 
 	}
 
 	return rd.driverBuilder.Build(builderDTO)
+}
+
+func (rd RedisDriver) ByDriverAndFromDate(id string, from time.Time) (domain.LocationList, error) {
+	driver, err := rd.ById(id)
+	if err != nil {
+		return domain.LocationList{}, err
+	}
+
+	locations := domain.LocationList{}
+	for _, location := range driver.Locations() {
+		if location.UpdatedAt().IsAfter(from) {
+			locations.Add(location)
+		}
+	}
+
+	sort.Sort(driver_location.ByUpdatedAt(locations))
+
+	return locations, nil
 }

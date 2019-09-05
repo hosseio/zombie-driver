@@ -46,3 +46,7 @@ func (u UpdatedAt) Date() time.Time {
 func (u UpdatedAt) String() string {
 	return u.Date().Format(time.RFC3339)
 }
+
+func (u UpdatedAt) IsAfter(date time.Time) bool {
+	return u.date.After(date) || u.date.Equal(date)
+}
