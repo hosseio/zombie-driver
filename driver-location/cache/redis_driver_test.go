@@ -37,7 +37,8 @@ func TestRedisDriver(t *testing.T) {
 	defer cleanRedis()
 	t.Run("Given a redis driver", func(t *testing.T) {
 		driverBuilder := driver_location.NewDriverBuilder()
-		sut := NewRedisDriver(redisAddr, driverBuilder)
+		transformer := driver_location.NewTransformer(driverBuilder)
+		sut := NewRedisDriver(redisAddr, transformer)
 		t.Run("When saving a driver with locations", func(t *testing.T) {
 			now := time.Now().UTC()
 			yesterday := now.AddDate(0, 0, -1)
