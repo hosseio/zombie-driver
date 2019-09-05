@@ -41,6 +41,7 @@ func (c NsqConsumer) Run(ctx context.Context) error {
 		}
 	})
 
+	<-ctx.Done()
 	ctxCancel()
 	if err := g.Wait(); err != nil {
 		return err
