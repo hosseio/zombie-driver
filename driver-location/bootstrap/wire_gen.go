@@ -6,11 +6,12 @@
 package bootstrap
 
 import (
+	"github.com/chiguirez/cromberbus"
 	"github.com/google/wire"
 	"github.com/heetch/jose-odg-technical-test/driver-location"
 	"github.com/heetch/jose-odg-technical-test/driver-location/cache"
 	http2 "github.com/heetch/jose-odg-technical-test/driver-location/http"
-	"github.com/heetch/jose-odg-technical-test/driver-location/internal"
+	"github.com/heetch/jose-odg-technical-test/driver-location/messaging"
 	"net/http"
 )
 
@@ -39,18 +40,64 @@ func InitializeRedisDriver(cfg Config) (cache.RedisDriver, error) {
 	return redisDriver, nil
 }
 
+func InitializeCreateDriverLocationNsqConsumer(cfg Config) (messaging.NsqConsumer, error) {
+	nsqAddr := getNsqAddr(cfg)
+	topicAddr := getTopicAddr(cfg)
+	channelAddr := getChannelAddr(cfg)
+	redisDriver, err := InitializeRedisDriver(cfg)
+	if err != nil {
+		return messaging.NsqConsumer{}, err
+	}
+	driverBuilder := driver_location.NewDriverBuilder()
+	createLocationCommandHandler := driver_location.NewCreateLocationCommandHandler(redisDriver, redisDriver, driverBuilder)
+	mapHandlerResolver := InitializeMapHandlerResolver(createLocationCommandHandler)
+	cromberBus := InitializeCromberbus(mapHandlerResolver)
+	createDriverLocationHandler := messaging.NewCreateDriverLocationHandler(cromberBus)
+	nsqConsumer := messaging.NewNsqConsumer(nsqAddr, topicAddr, channelAddr, createDriverLocationHandler)
+	return nsqConsumer, nil
+}
+
 // wire.go:
 
-var ServerSet = wire.NewSet(http2.NewServer, http2.NewRouter, http2.NewLocationController, InitializeRedisDriver, wire.Bind(new(domain.LocationView), cache.RedisDriver{}))
+var HttpSet = wire.NewSet(http2.NewServer, http2.NewRouter, http2.NewLocationController)
 
-var RedisSet = wire.NewSet(driver_location.NewDriverBuilder)
+var CacheSet = wire.NewSet(cache.NewRedisDriver)
 
-var AppSet = wire.NewSet(driver_location.NewLocationsByDriverAndTimeQueryService, driver_location.NewTransformer)
+var AppSet = wire.NewSet(driver_location.NewLocationsByDriverAndTimeQueryService, driver_location.NewTransformer, wire.Bind(new(cromberbus.CommandHandlerResolver), cromberbus.MapHandlerResolver{}), wire.Bind(new(cromberbus.CommandBus), cromberbus.CromberBus{}), InitializeCromberbus,
+	InitializeMapHandlerResolver, driver_location.NewCreateLocationCommandHandler, driver_location.NewDriverBuilder,
+)
+
+var MessagingSet = wire.NewSet(messaging.NewNsqConsumer, messaging.NewCreateDriverLocationHandler)
 
 func serverAddr(cfg Config) http2.ServerAddr {
 	return http2.ServerAddr(cfg.Server.Addr)
 }
 
+func InitializeCromberbus(handlerResolver cromberbus.CommandHandlerResolver) cromberbus.CromberBus {
+	return cromberbus.NewCromberBus(handlerResolver)
+}
+
+func InitializeMapHandlerResolver(
+	createLocationCommandHandler driver_location.CreateLocationCommandHandler,
+) cromberbus.MapHandlerResolver {
+	mapHandlerResolver := cromberbus.NewMapHandlerResolver()
+	mapHandlerResolver.AddHandler(new(driver_location.CreateLocationCommand), createLocationCommandHandler)
+
+	return mapHandlerResolver
+}
+
 func redisAddr(cfg Config) cache.RedisAddr {
 	return cache.RedisAddr(cfg.Redis)
+}
+
+func getNsqAddr(cfg Config) messaging.NsqAddr {
+	return messaging.NsqAddr(cfg.Nsq.Addr)
+}
+
+func getTopicAddr(cfg Config) messaging.TopicAddr {
+	return messaging.TopicAddr(cfg.Nsq.Topic)
+}
+
+func getChannelAddr(cfg Config) messaging.ChannelAddr {
+	return messaging.ChannelAddr(cfg.Nsq.Channel)
 }

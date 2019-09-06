@@ -43,7 +43,7 @@ func TestCreateDriverLocationConsumer(t *testing.T) {
 		}
 
 		sut = NewCreateDriverLocationHandler(bus)
-		consumer = NewNsqConsumer(nsqAddress, topic, "ch", sut)
+		consumer = NewNsqConsumer(NsqAddr(nsqAddress), TopicAddr(topic), ChannelAddr("ch"), sut)
 
 		syncChan = make(chan bool, 0)
 	}

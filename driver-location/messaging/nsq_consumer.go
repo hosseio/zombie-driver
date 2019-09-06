@@ -13,14 +13,18 @@ type NsqConsumer struct {
 	addr     string
 }
 
-func NewNsqConsumer(address, topic, channel string, handler nsq.Handler) NsqConsumer {
+type NsqAddr string
+type TopicAddr string
+type ChannelAddr string
+
+func NewNsqConsumer(address NsqAddr, topic TopicAddr, channel ChannelAddr, handler nsq.Handler) NsqConsumer {
 	config := nsq.NewConfig()
-	consumer, _ := nsq.NewConsumer(topic, channel, config)
+	consumer, _ := nsq.NewConsumer(string(topic), string(channel), config)
 	consumer.AddHandler(handler)
 
 	return NsqConsumer{
 		consumer: consumer,
-		addr:     address,
+		addr:     string(address),
 	}
 }
 

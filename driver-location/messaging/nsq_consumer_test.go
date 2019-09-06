@@ -37,7 +37,7 @@ func TestNsqConsumer(t *testing.T) {
 		setup()
 		defer producer.Stop()
 
-		sut := NewNsqConsumer(nsqAddress, topic, "ch", handler)
+		sut := NewNsqConsumer(NsqAddr(nsqAddress), TopicAddr(topic), ChannelAddr("ch"), handler)
 		go func() {
 			err := sut.Run(context.Background())
 			assertThat.NoError(err)
