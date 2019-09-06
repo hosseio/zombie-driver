@@ -10,7 +10,7 @@ import (
 
 	"github.com/satori/go.uuid"
 
-	"github.com/heetch/jose-odg-technical-test/driver-location"
+	"github.com/heetch/jose-odg-technical-test/driver-location/driver-location"
 
 	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/require"

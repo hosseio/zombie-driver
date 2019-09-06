@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/heetch/jose-odg-technical-test/driver-location"
+	"github.com/heetch/jose-odg-technical-test/driver-location/driver-location"
 
 	"github.com/gomodule/redigo/redis"
 	"github.com/satori/go.uuid"

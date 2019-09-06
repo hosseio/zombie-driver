@@ -3,7 +3,7 @@ package driver_location
 import (
 	"time"
 
-	"github.com/heetch/jose-odg-technical-test/driver-location/internal"
+	"github.com/heetch/jose-odg-technical-test/driver-location/driver-location/internal"
 )
 
 type DriverBuilder struct{}

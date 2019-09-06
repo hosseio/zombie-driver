@@ -6,10 +6,10 @@ import (
 	"sort"
 	"time"
 
-	"github.com/heetch/jose-odg-technical-test/driver-location"
+	"github.com/heetch/jose-odg-technical-test/driver-location/driver-location"
+	"github.com/heetch/jose-odg-technical-test/driver-location/driver-location/internal"
 
 	"github.com/gomodule/redigo/redis"
-	"github.com/heetch/jose-odg-technical-test/driver-location/internal"
 )
 
 const (

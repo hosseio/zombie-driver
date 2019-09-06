@@ -4,8 +4,9 @@ import (
 	"errors"
 	"time"
 
+	"github.com/heetch/jose-odg-technical-test/driver-location/driver-location/internal"
+
 	"github.com/chiguirez/cromberbus"
-	"github.com/heetch/jose-odg-technical-test/driver-location/internal"
 )
 
 var ErrNonCreateLocationCommand = errors.New("Cannot handle a non create location command")

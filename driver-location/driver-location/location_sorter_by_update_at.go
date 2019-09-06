@@ -1,6 +1,6 @@
 package driver_location
 
-import "github.com/heetch/jose-odg-technical-test/driver-location/internal"
+import "github.com/heetch/jose-odg-technical-test/driver-location/driver-location/internal"
 
 type ByUpdatedAt []domain.Location
 

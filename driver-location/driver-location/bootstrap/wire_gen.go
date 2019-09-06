@@ -8,10 +8,10 @@ package bootstrap
 import (
 	"github.com/chiguirez/cromberbus"
 	"github.com/google/wire"
-	"github.com/heetch/jose-odg-technical-test/driver-location"
-	"github.com/heetch/jose-odg-technical-test/driver-location/cache"
-	http2 "github.com/heetch/jose-odg-technical-test/driver-location/http"
-	"github.com/heetch/jose-odg-technical-test/driver-location/messaging"
+	"github.com/heetch/jose-odg-technical-test/driver-location/driver-location"
+	"github.com/heetch/jose-odg-technical-test/driver-location/driver-location/cache"
+	http2 "github.com/heetch/jose-odg-technical-test/driver-location/driver-location/http"
+	"github.com/heetch/jose-odg-technical-test/driver-location/driver-location/messaging"
 	"net/http"
 )
 

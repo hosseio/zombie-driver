@@ -7,7 +7,7 @@ import (
 
 	"github.com/arpando/controller"
 	"github.com/gorilla/mux"
-	"github.com/heetch/jose-odg-technical-test/driver-location"
+	"github.com/heetch/jose-odg-technical-test/driver-location/driver-location"
 )
 
 type ServerAddr string

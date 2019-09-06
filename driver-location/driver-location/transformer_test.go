@@ -17,8 +17,8 @@ func TestTransformer(t *testing.T) {
 		dto := DriverBuilderDTO{
 			DriverID: driverID,
 			Locations: []LocationBuilderDTO{
-				LocationBuilderDTO{0.0, 0.0, now},
-				LocationBuilderDTO{1.0, 1.0, now},
+				{0.0, 0.0, now},
+				{1.0, 1.0, now},
 			},
 		}
 		builder := NewDriverBuilder()

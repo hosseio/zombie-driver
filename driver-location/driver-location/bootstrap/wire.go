@@ -5,18 +5,18 @@ package bootstrap
 import (
 	netHttp "net/http"
 
-	"github.com/heetch/jose-odg-technical-test/driver-location/internal"
+	"github.com/heetch/jose-odg-technical-test/driver-location/driver-location"
+	"github.com/heetch/jose-odg-technical-test/driver-location/driver-location/internal"
 
 	"github.com/nsqio/go-nsq"
 
 	"github.com/chiguirez/cromberbus"
 
-	"github.com/heetch/jose-odg-technical-test/driver-location/messaging"
+	"github.com/heetch/jose-odg-technical-test/driver-location/driver-location/messaging"
 
 	"github.com/google/wire"
-	"github.com/heetch/jose-odg-technical-test/driver-location"
-	"github.com/heetch/jose-odg-technical-test/driver-location/cache"
-	"github.com/heetch/jose-odg-technical-test/driver-location/http"
+	"github.com/heetch/jose-odg-technical-test/driver-location/driver-location/cache"
+	"github.com/heetch/jose-odg-technical-test/driver-location/driver-location/http"
 )
 
 var HttpSet = wire.NewSet(

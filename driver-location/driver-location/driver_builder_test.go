@@ -4,8 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/heetch/jose-odg-technical-test/driver-location/internal"
-
+	"github.com/heetch/jose-odg-technical-test/driver-location/driver-location/internal"
 	"github.com/satori/go.uuid"
 
 	"github.com/stretchr/testify/require"
