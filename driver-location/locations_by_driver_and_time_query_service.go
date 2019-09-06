@@ -6,6 +6,11 @@ import (
 	"github.com/heetch/jose-odg-technical-test/driver-location/internal"
 )
 
+//go:generate moq -out locations_by_driver_and_time_getter_mock.go . LocationsByDriverAndTimeGetter
+type LocationsByDriverAndTimeGetter interface {
+	Get(driverID string, from time.Time) ([]LocationDTO, error)
+}
+
 type LocationsByDriverAndTimeQueryService struct {
 	view        domain.LocationView
 	transformer Transformer

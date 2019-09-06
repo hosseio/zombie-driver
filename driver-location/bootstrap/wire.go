@@ -38,6 +38,7 @@ var AppSet = wire.NewSet(
 	InitializeMapHandlerResolver,
 	driver_location.NewCreateLocationCommandHandler,
 	driver_location.NewDriverBuilder,
+	wire.Bind(new(driver_location.LocationsByDriverAndTimeGetter), driver_location.LocationsByDriverAndTimeQueryService{}),
 )
 
 var MessagingSet = wire.NewSet(

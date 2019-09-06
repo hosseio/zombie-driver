@@ -64,7 +64,7 @@ var HttpSet = wire.NewSet(http2.NewServer, http2.NewRouter, http2.NewLocationCon
 var CacheSet = wire.NewSet(cache.NewRedisDriver)
 
 var AppSet = wire.NewSet(driver_location.NewLocationsByDriverAndTimeQueryService, driver_location.NewTransformer, wire.Bind(new(cromberbus.CommandHandlerResolver), cromberbus.MapHandlerResolver{}), wire.Bind(new(cromberbus.CommandBus), cromberbus.CromberBus{}), InitializeCromberbus,
-	InitializeMapHandlerResolver, driver_location.NewCreateLocationCommandHandler, driver_location.NewDriverBuilder,
+	InitializeMapHandlerResolver, driver_location.NewCreateLocationCommandHandler, driver_location.NewDriverBuilder, wire.Bind(new(driver_location.LocationsByDriverAndTimeGetter), driver_location.LocationsByDriverAndTimeQueryService{}),
 )
 
 var MessagingSet = wire.NewSet(messaging.NewNsqConsumer, messaging.NewCreateDriverLocationHandler)

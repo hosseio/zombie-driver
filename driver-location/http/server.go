@@ -27,7 +27,6 @@ func NewRouter(l LocationController) *mux.Router {
 	router := mux.NewRouter()
 	router.
 		Path("/drivers/{id}/locations").
-		Queries("minutes", "{minutes}").
 		HandlerFunc(l.getLocationsHandler).
 		Methods(http.MethodGet)
 
@@ -36,10 +35,10 @@ func NewRouter(l LocationController) *mux.Router {
 
 type LocationController struct {
 	controller.Json
-	queryService driver_location.LocationsByDriverAndTimeQueryService
+	queryService driver_location.LocationsByDriverAndTimeGetter
 }
 
-func NewLocationController(queryService driver_location.LocationsByDriverAndTimeQueryService) LocationController {
+func NewLocationController(queryService driver_location.LocationsByDriverAndTimeGetter) LocationController {
 	return LocationController{queryService: queryService}
 }
 
