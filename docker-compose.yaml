@@ -29,3 +29,17 @@ services:
     links:
       - nsqlookupd:nsqlookupd
     command: /nsqadmin --lookupd-http-address=nsqlookupd:4161
+
+  driver-location:
+    build: "driver-location/"
+    depends_on:
+      - nsqd
+      - redis
+    environment:
+      SERVER_ADDR: ":8080"
+      NSQ_ADDR: "nsqd:4150"
+      NSQ_TOPIC: "driver_locations"
+      NSQ_CHANNEL: "ch"
+      REDIS: "redis:6379"
+    ports:
+      - "8080:8080"

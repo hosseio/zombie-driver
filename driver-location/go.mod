@@ -1,13 +1,11 @@
-module github.com/heetch/jose-odg-technical-test
+module github.com/heetch/jose-odg-technical-test/driver-location
 
 go 1.12
 
 require (
 	github.com/arpando/controller v0.0.0-20190117152505-793b99632f2a
-	github.com/bitly/go-nsq v1.0.7 // indirect
 	github.com/chiguirez/cromberbus v1.0.0
 	github.com/chiguirez/snout v0.0.0-20190828104309-671c457d4e1f
-	github.com/golang/protobuf v1.3.2
 	github.com/golang/snappy v0.0.1 // indirect
 	github.com/gomodule/redigo v2.0.0+incompatible
 	github.com/google/wire v0.3.0
