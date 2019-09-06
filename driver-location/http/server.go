@@ -10,9 +10,11 @@ import (
 	"github.com/heetch/jose-odg-technical-test/driver-location"
 )
 
-func NewServer(addr string, router *mux.Router) *http.Server {
+type ServerAddr string
+
+func NewServer(addr ServerAddr, router *mux.Router) *http.Server {
 	return &http.Server{
-		Addr:         addr,
+		Addr:         string(addr),
 		WriteTimeout: time.Second * 15,
 		ReadTimeout:  time.Second * 15,
 		IdleTimeout:  time.Second * 60,
@@ -35,6 +37,10 @@ func NewRouter(l LocationController) *mux.Router {
 type LocationController struct {
 	controller.Json
 	queryService driver_location.LocationsByDriverAndTimeQueryService
+}
+
+func NewLocationController(queryService driver_location.LocationsByDriverAndTimeQueryService) LocationController {
+	return LocationController{queryService: queryService}
 }
 
 func (l LocationController) getLocationsHandler(writer http.ResponseWriter, request *http.Request) {

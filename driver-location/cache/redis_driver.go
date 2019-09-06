@@ -22,10 +22,12 @@ type RedisDriver struct {
 	transformer driver_location.Transformer
 }
 
-func NewRedisDriver(address string, transformer driver_location.Transformer) RedisDriver {
+type RedisAddr string
+
+func NewRedisDriver(address RedisAddr, transformer driver_location.Transformer) RedisDriver {
 	pool := redis.Pool{
 		Dial: func() (conn redis.Conn, e error) {
-			return redis.Dial("tcp", address)
+			return redis.Dial("tcp", string(address))
 		},
 		MaxIdle:   80,
 		MaxActive: 12000,

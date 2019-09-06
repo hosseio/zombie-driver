@@ -9,6 +9,7 @@ require (
 	github.com/golang/protobuf v1.3.2
 	github.com/golang/snappy v0.0.1 // indirect
 	github.com/gomodule/redigo v2.0.0+incompatible
+	github.com/google/wire v0.3.0
 	github.com/gorilla/mux v1.7.3
 	github.com/nsqio/go-nsq v1.0.7
 	github.com/satori/go.uuid v1.2.0
