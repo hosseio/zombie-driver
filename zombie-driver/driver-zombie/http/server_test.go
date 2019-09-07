@@ -25,7 +25,7 @@ func TestServer(t *testing.T) {
 
 	setup := func() {
 		zombieResolverMock = &driver_zombie.IsZombieResolverMock{}
-		zombieController = NewLocationController(zombieResolverMock)
+		zombieController = NewZombieController(zombieResolverMock)
 		router = NewRouter(zombieController)
 	}
 

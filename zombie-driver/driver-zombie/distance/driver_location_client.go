@@ -16,12 +16,12 @@ type LocationsGetter interface {
 
 type DriverLocationClient struct {
 	httpClient *http.Client
-	baseUrl    BaseDriverLocationsURl
+	baseUrl    BaseDriverLocationsURL
 }
 
-type BaseDriverLocationsURl string
+type BaseDriverLocationsURL string
 
-func NewDriverLocationClient(baseURL BaseDriverLocationsURl) DriverLocationClient {
+func NewDriverLocationClient(baseURL BaseDriverLocationsURL) DriverLocationClient {
 	transport := &http.Transport{
 		Proxy: http.ProxyFromEnvironment,
 		DialContext: (&net.Dialer{

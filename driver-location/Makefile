@@ -11,9 +11,6 @@ help:
 	@echo "    unit-test            - run unit tests"
 	@echo "    integration-test     - run integration tests"
 	@echo "    test                 - run unit test and integration tests"
-	@echo "    init                 - start the driver-location container and its dependencies"
-	@echo "    finish               - stop the driver-location container and its dependencies"
-	@echo "    dependencies         - start the containers which the driver-location needs"
 	@echo "    up                   - start the driver-location container"
 	@echo "    down                 - stop the driver-location container"
 	@echo
@@ -30,22 +27,10 @@ install:
 	@go mod vendor
 	@go mod tidy
 
-dependencies:
-	cd ".."
-	docker-compose up -d redis
-	docker-compose up -d nsqlookupd
-	docker-compose up -d nsqd
-
-init: dependencies up
-
-finish:
-	cd ".."
-	docker-compose down
-
 up:
 	cd ".."
-	docker-compose up -d driver-location
+	@docker-compose up -d driver-location
 
 down:
 	cd ".."
-	docker-compose down driver-location
+	@docker-compose stop driver-location

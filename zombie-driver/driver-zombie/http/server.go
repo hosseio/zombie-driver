@@ -38,7 +38,7 @@ type ZombieController struct {
 	zombieResolver driver_zombie.IsZombieResolver
 }
 
-func NewLocationController(resolver driver_zombie.IsZombieResolver) ZombieController {
+func NewZombieController(resolver driver_zombie.IsZombieResolver) ZombieController {
 	return ZombieController{zombieResolver: resolver}
 }
 

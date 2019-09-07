@@ -44,3 +44,13 @@ services:
       REDIS: "redis:6379"
     ports:
       - "8080:8080"
+
+  zombie-driver:
+    build: "zombie-driver/"
+    depends_on:
+      - driver-location
+    environment:
+      SERVER_ADDR: ":7070"
+      DRIVER_LOCATION_BASE_URL: "driver-location:8080"
+    ports:
+      - "7070:7070"

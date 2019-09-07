@@ -6,6 +6,10 @@ import (
 
 type HardcodedZombieConfigGetter struct{}
 
+func NewHardcodedZombieConfigGetter() HardcodedZombieConfigGetter {
+	return HardcodedZombieConfigGetter{}
+}
+
 const MaxMeters = 500
 const LastMinutes = 5
 
