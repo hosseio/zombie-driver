@@ -19,7 +19,7 @@ import (
 func TestCreateDriverLocationConsumer(t *testing.T) {
 	assertThat := require.New(t)
 	nsqAddress := "127.0.0.1:4150"
-	topic := "topic_name"
+	topic := uuid.NewV4().String()
 
 	var (
 		sut CreateDriverLocationHandler

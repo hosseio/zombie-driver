@@ -3,10 +3,11 @@ package messaging
 import (
 	"encoding/json"
 
+	"github.com/heetch/jose-odg-technical-test/driver-location/driver-location"
+
 	"github.com/heetch/jose-odg-technical-test/driver-location/pkg"
 
 	"github.com/chiguirez/cromberbus"
-	"github.com/heetch/jose-odg-technical-test/driver-location/driver-location"
 	"github.com/nsqio/go-nsq"
 )
 
