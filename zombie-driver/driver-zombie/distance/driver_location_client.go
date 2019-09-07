@@ -9,6 +9,11 @@ import (
 	"time"
 )
 
+//go:generate moq -out locations_getter_mock.go . LocationsGetter
+type LocationsGetter interface {
+	GetLocations(driverID string, lastMinutes int) (LocationList, error)
+}
+
 type DriverLocationClient struct {
 	httpClient *http.Client
 	baseUrl    BaseDriverLocationsURl

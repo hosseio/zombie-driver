@@ -26,11 +26,15 @@ func (l LocationList) Get(index int) Location {
 }
 
 type LocationsDistanceCalculator struct {
-	DriverLocationClient DriverLocationClient
+	locationsGetter LocationsGetter
+}
+
+func NewLocationsDistanceCalculator(locationsGetter LocationsGetter) LocationsDistanceCalculator {
+	return LocationsDistanceCalculator{locationsGetter: locationsGetter}
 }
 
 func (c LocationsDistanceCalculator) Calculate(driverID string, lastMinutes int) (int, error) {
-	locations, err := c.DriverLocationClient.GetLocations(driverID, lastMinutes)
+	locations, err := c.locationsGetter.GetLocations(driverID, lastMinutes)
 	if err != nil {
 		return 0, err
 	}
@@ -74,7 +78,8 @@ func (c LocationsDistanceCalculator) calculateDistanceBetweenLocations(startLoca
 	dist = dist * 180 / PI
 	dist = dist * 60 * 1.1515
 
-	dist = dist * 1.609344 / 1000
+	//km * 1000m
+	dist = dist * 1.609344 * 1000
 
 	return dist
 }
