@@ -33,6 +33,7 @@ services:
   driver-location:
     build: "driver-location/"
     depends_on:
+      - nsqlookupd
       - nsqd
       - redis
     environment:
