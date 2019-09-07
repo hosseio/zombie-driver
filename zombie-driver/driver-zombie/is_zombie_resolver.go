@@ -17,7 +17,10 @@ func NewDriverIsZombieResolver(distanceCalculator DistanceCalculator, configGett
 func (r DriverIsZombieResolver) Resolve(driverID string) bool {
 	config := r.configGetter.GetZombieConfig()
 
-	distance := r.distanceCalculator.Calculate(driverID, config.LastMinutes)
+	distance, err := r.distanceCalculator.Calculate(driverID, config.LastMinutes)
+	if err != nil {
+		return false
+	}
 
 	return distance < config.MaxMeters
 }

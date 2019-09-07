@@ -21,7 +21,7 @@ var _ DistanceCalculator = &DistanceCalculatorMock{}
 //
 //         // make and configure a mocked DistanceCalculator
 //         mockedDistanceCalculator := &DistanceCalculatorMock{
-//             CalculateFunc: func(driverID string, lastMinutes int) int {
+//             CalculateFunc: func(driverID string, lastMinutes int) (int, error) {
 // 	               panic("mock out the Calculate method")
 //             },
 //         }
@@ -32,7 +32,7 @@ var _ DistanceCalculator = &DistanceCalculatorMock{}
 //     }
 type DistanceCalculatorMock struct {
 	// CalculateFunc mocks the Calculate method.
-	CalculateFunc func(driverID string, lastMinutes int) int
+	CalculateFunc func(driverID string, lastMinutes int) (int, error)
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -47,7 +47,7 @@ type DistanceCalculatorMock struct {
 }
 
 // Calculate calls CalculateFunc.
-func (mock *DistanceCalculatorMock) Calculate(driverID string, lastMinutes int) int {
+func (mock *DistanceCalculatorMock) Calculate(driverID string, lastMinutes int) (int, error) {
 	if mock.CalculateFunc == nil {
 		panic("DistanceCalculatorMock.CalculateFunc: method is nil but DistanceCalculator.Calculate was just called")
 	}
