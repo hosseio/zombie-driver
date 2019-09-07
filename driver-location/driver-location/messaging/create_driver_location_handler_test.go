@@ -9,7 +9,7 @@ import (
 
 	"github.com/chiguirez/cromberbus"
 
-	"github.com/heetch/jose-odg-technical-test/pkg"
+	"github.com/heetch/jose-odg-technical-test/driver-location/pkg"
 	"github.com/satori/go.uuid"
 
 	"github.com/nsqio/go-nsq"
