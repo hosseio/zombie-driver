@@ -29,7 +29,7 @@ install:
 
 up:
 	cd ".."
-	@docker-compose up -d driver-location
+	@docker-compose up -d --force-recreate driver-location
 
 down:
 	cd ".."

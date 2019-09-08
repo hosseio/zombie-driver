@@ -29,7 +29,7 @@ install:
 
 up:
 	cd ".."
-	@docker-compose up -d zombie-driver
+	@docker-compose up -d --force-recreate zombie-driver
 
 down:
 	cd ".."
