@@ -54,3 +54,14 @@ services:
       DRIVER_LOCATION_BASE_URL: "driver-location:8080"
     ports:
       - "7070:7070"
+
+  gateway:
+    build: "gateway/"
+    depends_on:
+      - driver-location
+      - zombie-driver
+    environment:
+      SERVER_ADDR: ":1138"
+      NSQ_ADDR: "nsqd:4150"
+    ports:
+      - "1138:1138"
