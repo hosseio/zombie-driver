@@ -47,7 +47,11 @@ var AppSet = wire.NewSet(
 )
 
 func newEventDispatcherMock() *pkg.EventDispatcherMock {
-	return &pkg.EventDispatcherMock{}
+	return &pkg.EventDispatcherMock{
+		DispatchFunc: func(domainEvent []pkg.DomainEvent) {
+			return
+		},
+	}
 }
 
 var MessagingSet = wire.NewSet(

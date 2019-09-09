@@ -28,9 +28,9 @@ install:
 	@go mod tidy
 
 up:
-	cd ".."
+	@cd ".."
 	@docker-compose up -d --force-recreate gateway
 
 down:
-	cd ".."
+	@cd ".."
 	@docker-compose stop gateway

@@ -1,0 +1,4 @@
+server:
+  addr: ":1138"
+nsq:
+  addr: "nsqd:4150"

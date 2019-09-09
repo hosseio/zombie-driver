@@ -71,7 +71,11 @@ var AppSet = wire.NewSet(driver_location.NewLocationsByDriverAndTimeQueryService
 )
 
 func newEventDispatcherMock() *pkg.EventDispatcherMock {
-	return &pkg.EventDispatcherMock{}
+	return &pkg.EventDispatcherMock{
+		DispatchFunc: func(domainEvent []pkg.DomainEvent) {
+			return
+		},
+	}
 }
 
 var MessagingSet = wire.NewSet(messaging.NewNsqConsumer, messaging.NewCreateDriverLocationHandler)

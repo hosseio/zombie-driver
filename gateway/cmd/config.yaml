@@ -8,4 +8,4 @@ urls:
     path: "/drivers/:id"
     method: "GET"
     http:
-      host: "zombie-driver"
+      host: "zombie-driver:7070"

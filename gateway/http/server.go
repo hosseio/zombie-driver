@@ -37,15 +37,16 @@ func NewRouter(
 	for _, nsqEndpoint := range nsqController.NSQEndpoints {
 		router.
 			Path(nsqEndpoint.Path).
-			HandlerFunc(nsqController.handleNSQ).
-			Methods(nsqEndpoint.Method)
+			Methods(nsqEndpoint.Method).
+			HandlerFunc(nsqController.handleNSQ)
 	}
 
 	for _, redirectEndpoint := range redirectController.RedirectEndpoints {
 		router.
 			Path(redirectEndpoint.Path).
-			HandlerFunc(redirectController.handleRedirect).
-			Methods(redirectEndpoint.Method)
+			Methods(redirectEndpoint.Method).
+			HandlerFunc(redirectController.handleRedirect)
+
 	}
 
 	router.Path("/healthz").Methods(http.MethodGet).HandlerFunc(healthController.healthz)

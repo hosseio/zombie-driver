@@ -31,7 +31,7 @@ services:
     command: /nsqadmin --lookupd-http-address=nsqlookupd:4161
 
   driver-location:
-    build: "driver-location/"
+    build: "./driver-location"
     depends_on:
       - nsqlookupd
       - nsqd
@@ -39,14 +39,14 @@ services:
     environment:
       SERVER_ADDR: ":8080"
       NSQ_ADDR: "nsqd:4150"
-      NSQ_TOPIC: "driver_locations"
+      NSQ_TOPIC: "locations"
       NSQ_CHANNEL: "ch"
       REDIS: "redis:6379"
     ports:
       - "8080:8080"
 
   zombie-driver:
-    build: "zombie-driver/"
+    build: "./zombie-driver"
     depends_on:
       - driver-location
       - redis
@@ -58,7 +58,7 @@ services:
       - "7070:7070"
 
   gateway:
-    build: "gateway/"
+    build: "./gateway"
     depends_on:
       - driver-location
       - zombie-driver

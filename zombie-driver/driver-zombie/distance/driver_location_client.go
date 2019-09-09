@@ -42,10 +42,10 @@ func NewDriverLocationClient(baseURL BaseDriverLocationsURL) DriverLocationClien
 	return DriverLocationClient{client, baseURL}
 }
 
-const getDriverLocationsEndpoint = "/drivers/%s/locations?minutes=%s"
+const getDriverLocationsEndpoint = "http://%s/drivers/%s/locations?minutes=%d"
 
 func (c DriverLocationClient) GetLocations(driverID string, lastMinutes int) (LocationList, error) {
-	url := fmt.Sprintf(getDriverLocationsEndpoint, c.baseUrl, driverID)
+	url := fmt.Sprintf(getDriverLocationsEndpoint, c.baseUrl, driverID, lastMinutes)
 
 	var locations LocationList
 	if err := c.get(url, &locations); err != nil {

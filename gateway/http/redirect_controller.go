@@ -1,6 +1,8 @@
 package http
 
 import (
+	"encoding/json"
+	"io/ioutil"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -40,17 +42,36 @@ func (c RedirectController) handleRedirect(writer http.ResponseWriter, request *
 		route := mux.CurrentRoute(request)
 		path, err := route.GetPathTemplate()
 		if err != nil {
-			return http.StatusInternalServerError, EmptyResponse{}
+			return http.StatusInternalServerError, err.Error()
 		}
 		hostTo := c.getHostByPath(path)
 
-		http.Redirect(writer, request, hostTo, http.StatusMovedPermanently)
+		url := *request.URL
+		url.Host = hostTo
+		url.Scheme = "http"
 
-		response, err := http.DefaultClient.Do(request)
+		newRequest, err := http.NewRequest(request.Method, url.String(), request.Body)
+		newRequest.URL = &url
 		if err != nil {
-			return http.StatusInternalServerError, EmptyResponse{}
+			return http.StatusInternalServerError, err.Error()
 		}
 
-		return response.StatusCode, response.Body
+		response, err := http.DefaultClient.Do(newRequest)
+		if err != nil {
+			return http.StatusInternalServerError, err.Error()
+		}
+
+		jsonResponse, err := ioutil.ReadAll(response.Body)
+		if err != nil {
+			return http.StatusInternalServerError, err.Error()
+		}
+
+		b := map[string]interface{}{}
+		err = json.Unmarshal(jsonResponse, &b)
+		if err != nil {
+			return http.StatusInternalServerError, err.Error()
+		}
+
+		return response.StatusCode, b
 	})
 }

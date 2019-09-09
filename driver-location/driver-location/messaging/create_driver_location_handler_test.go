@@ -10,7 +10,6 @@ import (
 
 	"github.com/chiguirez/cromberbus"
 
-	"github.com/heetch/jose-odg-technical-test/driver-location/pkg"
 	"github.com/satori/go.uuid"
 
 	"github.com/nsqio/go-nsq"
@@ -66,7 +65,7 @@ func TestCreateDriverLocationConsumer(t *testing.T) {
 			assertThat.NoError(err)
 		}()
 		t.Run("When a create driver location message is sent to that topic", func(t *testing.T) {
-			message := pkg.CreateDriverLocationMessage{
+			message := CreateDriverLocationMessageDTO{
 				DriverID: uuid.NewV4().String(),
 				Lat:      0.0,
 				Lon:      0.0,

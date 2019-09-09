@@ -35,7 +35,7 @@ func (t Transformer) DriverEntityToDTO(driver domain.Driver) DriverLocationDTO {
 }
 
 func (t Transformer) LocationListToDTO(locations domain.LocationList) []LocationDTO {
-	locationsDTO := make([]LocationDTO, 0)
+	locationsDTO := []LocationDTO{}
 	for _, location := range locations {
 		locationsDTO = append(locationsDTO, t.LocationEntityToDTO(location))
 	}

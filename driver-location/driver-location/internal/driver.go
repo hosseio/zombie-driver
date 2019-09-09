@@ -22,7 +22,7 @@ func NewDriver(driverID DriverID, locations LocationList) (Driver, error) {
 	return driver, nil
 }
 
-func (d Driver) AddLocation(location Location) {
+func (d *Driver) AddLocation(location Location) {
 	d.locations.Add(location)
 
 	d.Record(LocationAddedToDriver{

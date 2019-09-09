@@ -21,7 +21,7 @@ func (c Config) UrlConfig() URLConfig {
 	return c.urlConfig
 }
 
-func (c Config) ReadURLConfiguration(filename string) error {
+func (c *Config) ReadURLConfiguration(filename string) error {
 	var urlConfig URLConfig
 	endpointsFromFile, err := ioutil.ReadFile(filename)
 	if err != nil {

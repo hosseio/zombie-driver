@@ -2,14 +2,19 @@ package messaging
 
 import (
 	"encoding/json"
+	"log"
 
 	"github.com/heetch/jose-odg-technical-test/driver-location/driver-location"
-
-	"github.com/heetch/jose-odg-technical-test/driver-location/pkg"
 
 	"github.com/chiguirez/cromberbus"
 	"github.com/nsqio/go-nsq"
 )
+
+type CreateDriverLocationMessageDTO struct {
+	DriverID string  `json:"id"`
+	Lat      float32 `json:"latitude"`
+	Lon      float32 `json:"longitude"`
+}
 
 type CreateDriverLocationHandler struct {
 	commandBus cromberbus.CommandBus
@@ -20,9 +25,10 @@ func NewCreateDriverLocationHandler(commandBus cromberbus.CommandBus) CreateDriv
 }
 
 func (c CreateDriverLocationHandler) HandleMessage(message *nsq.Message) error {
-	createDriverLocationMessage := pkg.CreateDriverLocationMessage{}
+	createDriverLocationMessage := CreateDriverLocationMessageDTO{}
 	err := json.Unmarshal(message.Body, &createDriverLocationMessage)
 	if err != nil {
+		log.Fatal(err.Error())
 		return err
 	}
 
