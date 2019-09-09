@@ -16,6 +16,15 @@ func (l *LocationList) Add(location Location) {
 	*l = append([]Location(*l), location)
 }
 
+func (l LocationList) toEventDTO() []LocationDTO {
+	locations := []LocationDTO{}
+	for _, location := range l {
+		locations = append(locations, location.toEventDTO())
+	}
+
+	return locations
+}
+
 const (
 	minLat = -90
 	maxLat = 90
@@ -56,4 +65,12 @@ func (l Location) Longitude() float64 {
 
 func (l Location) UpdatedAt() UpdatedAt {
 	return l.updatedAt
+}
+
+func (l Location) toEventDTO() LocationDTO {
+	return LocationDTO{
+		Latitude:  l.latitude,
+		Longitude: l.longitude,
+		UpdatedAt: l.updatedAt.Date(),
+	}
 }

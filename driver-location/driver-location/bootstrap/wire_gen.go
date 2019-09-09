@@ -12,6 +12,7 @@ import (
 	"github.com/heetch/jose-odg-technical-test/driver-location/driver-location/cache"
 	http2 "github.com/heetch/jose-odg-technical-test/driver-location/driver-location/http"
 	"github.com/heetch/jose-odg-technical-test/driver-location/driver-location/messaging"
+	"github.com/heetch/jose-odg-technical-test/driver-location/pkg"
 	"net/http"
 )
 
@@ -27,7 +28,8 @@ func InitializeServer(cfg Config) (*http.Server, error) {
 	transformer := driver_location.NewTransformer(driverBuilder)
 	locationsByDriverAndTimeQueryService := driver_location.NewLocationsByDriverAndTimeQueryService(redisDriver, transformer)
 	locationController := http2.NewLocationController(locationsByDriverAndTimeQueryService)
-	router := http2.NewRouter(locationController)
+	healthController := http2.NewHealthController()
+	router := http2.NewRouter(locationController, healthController)
 	server := http2.NewServer(httpServerAddr, router)
 	return server, nil
 }
@@ -49,7 +51,8 @@ func InitializeCreateDriverLocationNsqConsumer(cfg Config) (messaging.NsqConsume
 		return messaging.NsqConsumer{}, err
 	}
 	driverBuilder := driver_location.NewDriverBuilder()
-	createLocationCommandHandler := driver_location.NewCreateLocationCommandHandler(redisDriver, redisDriver, driverBuilder)
+	eventDispatcherMock := newEventDispatcherMock()
+	createLocationCommandHandler := driver_location.NewCreateLocationCommandHandler(redisDriver, redisDriver, driverBuilder, eventDispatcherMock)
 	mapHandlerResolver := InitializeMapHandlerResolver(createLocationCommandHandler)
 	cromberBus := InitializeCromberbus(mapHandlerResolver)
 	createDriverLocationHandler := messaging.NewCreateDriverLocationHandler(cromberBus)
@@ -59,13 +62,17 @@ func InitializeCreateDriverLocationNsqConsumer(cfg Config) (messaging.NsqConsume
 
 // wire.go:
 
-var HttpSet = wire.NewSet(http2.NewServer, http2.NewRouter, http2.NewLocationController)
+var HttpSet = wire.NewSet(http2.NewServer, http2.NewRouter, http2.NewLocationController, http2.NewHealthController)
 
 var CacheSet = wire.NewSet(cache.NewRedisDriver)
 
 var AppSet = wire.NewSet(driver_location.NewLocationsByDriverAndTimeQueryService, driver_location.NewTransformer, wire.Bind(new(cromberbus.CommandHandlerResolver), cromberbus.MapHandlerResolver{}), wire.Bind(new(cromberbus.CommandBus), cromberbus.CromberBus{}), InitializeCromberbus,
-	InitializeMapHandlerResolver, driver_location.NewCreateLocationCommandHandler, driver_location.NewDriverBuilder, wire.Bind(new(driver_location.LocationsByDriverAndTimeGetter), driver_location.LocationsByDriverAndTimeQueryService{}),
+	InitializeMapHandlerResolver, driver_location.NewCreateLocationCommandHandler, driver_location.NewDriverBuilder, wire.Bind(new(driver_location.LocationsByDriverAndTimeGetter), driver_location.LocationsByDriverAndTimeQueryService{}), wire.Bind(new(pkg.EventDispatcher), new(pkg.EventDispatcherMock)), newEventDispatcherMock,
 )
+
+func newEventDispatcherMock() *pkg.EventDispatcherMock {
+	return &pkg.EventDispatcherMock{}
+}
 
 var MessagingSet = wire.NewSet(messaging.NewNsqConsumer, messaging.NewCreateDriverLocationHandler)
 

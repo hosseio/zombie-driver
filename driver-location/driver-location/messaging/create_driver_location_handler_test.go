@@ -5,6 +5,7 @@ package messaging
 import (
 	"context"
 	"encoding/json"
+	"os"
 	"testing"
 
 	"github.com/chiguirez/cromberbus"
@@ -18,7 +19,10 @@ import (
 
 func TestCreateDriverLocationConsumer(t *testing.T) {
 	assertThat := require.New(t)
-	nsqAddress := "127.0.0.1:4150"
+	nsqAddress := os.Getenv("NSQ")
+	if nsqAddress == "" {
+		nsqAddress = "127.0.0.1:4150"
+	}
 	topic := uuid.NewV4().String()
 
 	var (

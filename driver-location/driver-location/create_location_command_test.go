@@ -3,6 +3,8 @@ package driver_location
 import (
 	"testing"
 
+	"github.com/heetch/jose-odg-technical-test/driver-location/pkg"
+
 	"github.com/heetch/jose-odg-technical-test/driver-location/driver-location/internal"
 	"github.com/satori/go.uuid"
 
@@ -23,7 +25,12 @@ func TestCreateLocationCommandHandler_Handle(t *testing.T) {
 			},
 		}
 		driverCreator := NewDriverBuilder()
-		sut := NewCreateLocationCommandHandler(driverViewMock, driverRepositoryMock, driverCreator)
+		dispatcherMock := &pkg.EventDispatcherMock{
+			DispatchFunc: func(domainEvent []pkg.DomainEvent) {
+				return
+			},
+		}
+		sut := NewCreateLocationCommandHandler(driverViewMock, driverRepositoryMock, driverCreator, dispatcherMock)
 		t.Run("When it handles the create location command", func(t *testing.T) {
 			command := CreateLocationCommand{
 				DriverID:  uuid.NewV4().String(),
@@ -34,6 +41,9 @@ func TestCreateLocationCommandHandler_Handle(t *testing.T) {
 			t.Run("Then the driver of the new location is saved", func(t *testing.T) {
 				assertThat.NoError(err)
 				assertThat.True(len(driverRepositoryMock.SaveCalls()) > 0)
+			})
+			t.Run("And the domain events are dispatched", func(t *testing.T) {
+				assertThat.True(len(dispatcherMock.DispatchCalls()) > 0)
 			})
 		})
 		t.Run("When it handles a non create location command", func(t *testing.T) {

@@ -4,6 +4,8 @@ import (
 	"errors"
 	"time"
 
+	"github.com/heetch/jose-odg-technical-test/driver-location/pkg"
+
 	"github.com/heetch/jose-odg-technical-test/driver-location/driver-location/internal"
 
 	"github.com/chiguirez/cromberbus"
@@ -21,14 +23,21 @@ type CreateLocationCommandHandler struct {
 	driverView       domain.DriverView
 	driverRepository domain.DriverRepository
 	driverBuilder    DriverBuilder
+	eventDispatcher  pkg.EventDispatcher
 }
 
 func NewCreateLocationCommandHandler(
 	driverView domain.DriverView,
 	driverRepository domain.DriverRepository,
 	driverBuilder DriverBuilder,
+	eventDispatcher pkg.EventDispatcher,
 ) CreateLocationCommandHandler {
-	return CreateLocationCommandHandler{driverView: driverView, driverRepository: driverRepository, driverBuilder: driverBuilder}
+	return CreateLocationCommandHandler{
+		driverView:       driverView,
+		driverRepository: driverRepository,
+		driverBuilder:    driverBuilder,
+		eventDispatcher:  eventDispatcher,
+	}
 }
 
 func (h CreateLocationCommandHandler) Handle(command cromberbus.Command) error {
@@ -53,7 +62,15 @@ func (h CreateLocationCommandHandler) Handle(command cromberbus.Command) error {
 
 	driver.AddLocation(location)
 
-	return h.driverRepository.Save(driver)
+	err = h.driverRepository.Save(driver)
+	if err != nil {
+		return err
+	}
+
+	h.eventDispatcher.Dispatch(driver.Uncommited())
+	driver.ClearEvents()
+
+	return nil
 }
 
 func (h CreateLocationCommandHandler) getDriver(driverID string) (domain.Driver, error) {

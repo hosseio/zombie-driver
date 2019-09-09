@@ -5,6 +5,8 @@ package bootstrap
 import (
 	netHttp "net/http"
 
+	"github.com/heetch/jose-odg-technical-test/driver-location/pkg"
+
 	"github.com/heetch/jose-odg-technical-test/driver-location/driver-location"
 	"github.com/heetch/jose-odg-technical-test/driver-location/driver-location/internal"
 
@@ -23,6 +25,7 @@ var HttpSet = wire.NewSet(
 	http.NewServer,
 	http.NewRouter,
 	http.NewLocationController,
+	http.NewHealthController,
 )
 
 var CacheSet = wire.NewSet(
@@ -39,7 +42,13 @@ var AppSet = wire.NewSet(
 	driver_location.NewCreateLocationCommandHandler,
 	driver_location.NewDriverBuilder,
 	wire.Bind(new(driver_location.LocationsByDriverAndTimeGetter), driver_location.LocationsByDriverAndTimeQueryService{}),
+	wire.Bind(new(pkg.EventDispatcher), new(pkg.EventDispatcherMock)),
+	newEventDispatcherMock,
 )
+
+func newEventDispatcherMock() *pkg.EventDispatcherMock {
+	return &pkg.EventDispatcherMock{}
+}
 
 var MessagingSet = wire.NewSet(
 	messaging.NewNsqConsumer,
