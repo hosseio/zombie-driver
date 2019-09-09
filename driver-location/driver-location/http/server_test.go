@@ -28,7 +28,7 @@ func TestServer(t *testing.T) {
 	setup := func() {
 		locationsByDriverAndTimeGetter = &driver_location.LocationsByDriverAndTimeGetterMock{}
 		locationController = NewLocationController(locationsByDriverAndTimeGetter)
-		sut = NewRouter(locationController)
+		sut = NewRouter(locationController, NewHealthController())
 	}
 
 	t.Run("Given a server", func(t *testing.T) {
@@ -42,6 +42,15 @@ func TestServer(t *testing.T) {
 				{48.863921, 2.349211, secondUpdatedAt},
 			}, nil
 		}
+		t.Run("When consuming health endpoint", func(t *testing.T) {
+			req, err := http.NewRequest(http.MethodGet, "/healthz", nil)
+			assertThat.NoError(err)
+			res := httptest.NewRecorder()
+			sut.ServeHTTP(res, req)
+			t.Run("Then a 200 status code is returned", func(t *testing.T) {
+				assertThat.Equal(http.StatusOK, res.Code)
+			})
+		})
 		t.Run("When consuming driver locations endpoint", func(t *testing.T) {
 			req, err := http.NewRequest(http.MethodGet, "/drivers/"+driverID+"/locations?minutes=5", nil)
 			assertThat.NoError(err)

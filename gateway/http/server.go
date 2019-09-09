@@ -30,6 +30,7 @@ type Endpoints struct {
 func NewRouter(
 	nsqController NSQController,
 	redirectController RedirectController,
+	healthController HealthController,
 ) *mux.Router {
 	router := mux.NewRouter()
 
@@ -46,6 +47,8 @@ func NewRouter(
 			HandlerFunc(redirectController.handleRedirect).
 			Methods(redirectEndpoint.Method)
 	}
+
+	router.Path("/healthz").Methods(http.MethodGet).HandlerFunc(healthController.healthz)
 
 	return router
 }

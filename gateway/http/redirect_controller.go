@@ -44,10 +44,13 @@ func (c RedirectController) handleRedirect(writer http.ResponseWriter, request *
 		}
 		hostTo := c.getHostByPath(path)
 
-		u := *request.URL
-		u.Host = hostTo
-		http.Redirect(writer, request, u.String(), http.StatusMovedPermanently)
+		http.Redirect(writer, request, hostTo, http.StatusMovedPermanently)
 
-		return http.StatusMovedPermanently, EmptyResponse{}
+		response, err := http.DefaultClient.Do(request)
+		if err != nil {
+			return http.StatusInternalServerError, EmptyResponse{}
+		}
+
+		return response.StatusCode, response.Body
 	})
 }

@@ -23,12 +23,14 @@ func NewServer(addr ServerAddr, router *mux.Router) *http.Server {
 	}
 }
 
-func NewRouter(l LocationController) *mux.Router {
+func NewRouter(l LocationController, hc HealthController) *mux.Router {
 	router := mux.NewRouter()
 	router.
 		Path("/drivers/{id}/locations").
 		HandlerFunc(l.getLocationsHandler).
 		Methods(http.MethodGet)
+
+	router.Path("/healthz").Methods(http.MethodGet).HandlerFunc(hc.healthz)
 
 	return router
 }

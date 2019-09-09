@@ -1,6 +1,8 @@
 package http
 
 import (
+	"encoding/json"
+	"io/ioutil"
 	"net/http"
 	"time"
 
@@ -23,14 +25,46 @@ func NewServer(addr ServerAddr, router *mux.Router) *http.Server {
 	}
 }
 
-func NewRouter(l ZombieController) *mux.Router {
+func NewRouter(zc ZombieController, cc ConfigController, hc HealthController) *mux.Router {
 	router := mux.NewRouter()
 	router.
 		Path("/drivers/{id}").
-		HandlerFunc(l.driverIsZombieHandler).
+		HandlerFunc(zc.driverIsZombieHandler).
 		Methods(http.MethodGet)
+	router.Path("/config").
+		HandlerFunc(cc.updateConfigHandler).
+		Methods(http.MethodPatch)
+
+	router.Path("/healthz").Methods(http.MethodGet).HandlerFunc(hc.healthz)
 
 	return router
+}
+
+type ConfigController struct {
+	controller.Json
+	configurer driver_zombie.ZombieConfigurer
+}
+
+func NewConfigController(configurer driver_zombie.ZombieConfigurer) ConfigController {
+	return ConfigController{configurer: configurer}
+}
+
+func (c ConfigController) updateConfigHandler(writer http.ResponseWriter, request *http.Request) {
+	c.Handle(writer, request, func() (int, interface{}) {
+		body, err := ioutil.ReadAll(request.Body)
+		var projection driver_zombie.ZombieConfigProjection
+		err = json.Unmarshal(body, &projection)
+		if err != nil {
+			return http.StatusInternalServerError, err
+		}
+
+		err = c.configurer.SetZombieConfig(projection)
+		if err != nil {
+			return http.StatusInternalServerError, err
+		}
+
+		return http.StatusOK, projection
+	})
 }
 
 type ZombieController struct {
@@ -47,12 +81,12 @@ type ZombieResponse struct {
 	Zombie bool   `json:"zombie"`
 }
 
-func (l ZombieController) driverIsZombieHandler(writer http.ResponseWriter, request *http.Request) {
-	l.Handle(writer, request, func() (int, interface{}) {
+func (c ZombieController) driverIsZombieHandler(writer http.ResponseWriter, request *http.Request) {
+	c.Handle(writer, request, func() (int, interface{}) {
 		vars := mux.Vars(request)
 		driverID := vars["id"]
 
-		isZombie := l.zombieResolver.Resolve(driverID)
+		isZombie := c.zombieResolver.Resolve(driverID)
 
 		return http.StatusOK, ZombieResponse{driverID, isZombie}
 	})

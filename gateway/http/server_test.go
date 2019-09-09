@@ -43,12 +43,20 @@ func TestServer(t *testing.T) {
 		}
 		nsqController = NewNSQController(endpoints.NSQEndpoints, producer)
 		redirectController = NewRedirectController(endpoints.RedirectEndpoints)
-		sut = NewRouter(nsqController, redirectController)
+		sut = NewRouter(nsqController, redirectController, NewHealthController())
 	}
 
 	t.Run("Given a server", func(t *testing.T) {
 		setup()
-
+		t.Run("When consuming health endpoint", func(t *testing.T) {
+			req, err := http.NewRequest(http.MethodGet, "/healthz", nil)
+			assertThat.NoError(err)
+			res := httptest.NewRecorder()
+			sut.ServeHTTP(res, req)
+			t.Run("Then a 200 status code is returned", func(t *testing.T) {
+				assertThat.Equal(http.StatusOK, res.Code)
+			})
+		})
 		t.Run("When consuming nsq endpoints", func(t *testing.T) {
 			body := map[string]interface{}{"latitude": 1.23, "longitude": 3.21}
 			bodyJson, _ := json.Marshal(body)
