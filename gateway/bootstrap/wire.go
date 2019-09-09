@@ -16,6 +16,7 @@ var HttpSet = wire.NewSet(
 	http.NewRouter,
 	http.NewNSQController,
 	http.NewRedirectController,
+	http.NewHealthController,
 )
 
 var MessagingSet = wire.NewSet(

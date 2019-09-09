@@ -3,6 +3,7 @@
 package messaging
 
 import (
+	"os"
 	"testing"
 
 	"github.com/nsqio/go-nsq"
@@ -12,7 +13,10 @@ import (
 
 func TestNsqConsumer(t *testing.T) {
 	assertThat := require.New(t)
-	nsqAddress := "127.0.0.1:4150"
+	nsqAddress := os.Getenv("NSQ")
+	if nsqAddress == "" {
+		nsqAddress = "127.0.0.1:4150"
+	}
 	topic := uuid.NewV4().String()
 
 	var (

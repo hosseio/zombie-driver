@@ -24,7 +24,8 @@ func InitializeServer(cfg Config) (*http.Server, error) {
 	nsqController := http2.NewNSQController(v, nsqProducer)
 	v2 := getRedirectEndpoints(cfg)
 	redirectController := http2.NewRedirectController(v2)
-	router := http2.NewRouter(nsqController, redirectController)
+	healthController := http2.NewHealthController()
+	router := http2.NewRouter(nsqController, redirectController, healthController)
 	server := http2.NewServer(httpServerAddr, router)
 	return server, nil
 }
@@ -40,7 +41,7 @@ func InitializeProducer(cfg Config) (messaging.NSQProducer, error) {
 
 // wire.go:
 
-var HttpSet = wire.NewSet(http2.NewServer, http2.NewRouter, http2.NewNSQController, http2.NewRedirectController)
+var HttpSet = wire.NewSet(http2.NewServer, http2.NewRouter, http2.NewNSQController, http2.NewRedirectController, http2.NewHealthController)
 
 var MessagingSet = wire.NewSet(messaging.NewNSQPRoducer)
 

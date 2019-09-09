@@ -20,6 +20,7 @@ var HttpSet = wire.NewSet(
 	http.NewRouter,
 	http.NewZombieController,
 	http.NewConfigController,
+	http.NewHealthController,
 )
 
 var AppSet = wire.NewSet(

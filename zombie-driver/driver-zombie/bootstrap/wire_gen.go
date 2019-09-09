@@ -40,7 +40,8 @@ func InitializeServer(cfg Config) (*http.Server, error) {
 	driverIsZombieResolver := driver_zombie.NewDriverIsZombieResolver(locationsDistanceCalculator, redisZombieConfigurer)
 	zombieController := http2.NewZombieController(driverIsZombieResolver)
 	configController := http2.NewConfigController(redisZombieConfigurer)
-	router := http2.NewRouter(zombieController, configController)
+	healthController := http2.NewHealthController()
+	router := http2.NewRouter(zombieController, configController, healthController)
 	server := http2.NewServer(httpServerAddr, router)
 	return server, nil
 }
@@ -54,7 +55,7 @@ func InitializeLocationsDistanceCalculator(cfg Config) (distance.LocationsDistan
 
 // wire.go:
 
-var HttpSet = wire.NewSet(http2.NewServer, http2.NewRouter, http2.NewZombieController, http2.NewConfigController)
+var HttpSet = wire.NewSet(http2.NewServer, http2.NewRouter, http2.NewZombieController, http2.NewConfigController, http2.NewHealthController)
 
 var AppSet = wire.NewSet(driver_zombie.NewDriverIsZombieResolver, wire.Bind(new(driver_zombie.IsZombieResolver), driver_zombie.DriverIsZombieResolver{}))
 
