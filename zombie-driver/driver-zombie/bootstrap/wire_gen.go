@@ -16,6 +16,12 @@ import (
 
 // Injectors from wire.go:
 
+func InitializeRedisZombieConfigurer(cfg Config) (zombie_configuration.RedisZombieConfigurer, error) {
+	redisAddr := getRedisAddr(cfg)
+	redisZombieConfigurer := zombie_configuration.NewRedisZombieConfigurer(redisAddr)
+	return redisZombieConfigurer, nil
+}
+
 func InitializeHardcodedZombieConfigGetter(cfg Config) (zombie_configuration.HardcodedZombieConfigGetter, error) {
 	hardcodedZombieConfigGetter := zombie_configuration.NewHardcodedZombieConfigGetter()
 	return hardcodedZombieConfigGetter, nil
@@ -27,13 +33,14 @@ func InitializeServer(cfg Config) (*http.Server, error) {
 	if err != nil {
 		return nil, err
 	}
-	hardcodedZombieConfigGetter, err := InitializeHardcodedZombieConfigGetter(cfg)
+	redisZombieConfigurer, err := InitializeRedisZombieConfigurer(cfg)
 	if err != nil {
 		return nil, err
 	}
-	driverIsZombieResolver := driver_zombie.NewDriverIsZombieResolver(locationsDistanceCalculator, hardcodedZombieConfigGetter)
+	driverIsZombieResolver := driver_zombie.NewDriverIsZombieResolver(locationsDistanceCalculator, redisZombieConfigurer)
 	zombieController := http2.NewZombieController(driverIsZombieResolver)
-	router := http2.NewRouter(zombieController)
+	configController := http2.NewConfigController(redisZombieConfigurer)
+	router := http2.NewRouter(zombieController, configController)
 	server := http2.NewServer(httpServerAddr, router)
 	return server, nil
 }
@@ -47,11 +54,15 @@ func InitializeLocationsDistanceCalculator(cfg Config) (distance.LocationsDistan
 
 // wire.go:
 
-var HttpSet = wire.NewSet(http2.NewServer, http2.NewRouter, http2.NewZombieController)
+var HttpSet = wire.NewSet(http2.NewServer, http2.NewRouter, http2.NewZombieController, http2.NewConfigController)
 
 var AppSet = wire.NewSet(driver_zombie.NewDriverIsZombieResolver, wire.Bind(new(driver_zombie.IsZombieResolver), driver_zombie.DriverIsZombieResolver{}))
 
-var ZombieConfigurationSet = wire.NewSet(zombie_configuration.NewHardcodedZombieConfigGetter)
+var ZombieConfigurationSet = wire.NewSet(zombie_configuration.NewHardcodedZombieConfigGetter, zombie_configuration.NewRedisZombieConfigurer)
+
+func getRedisAddr(cfg Config) zombie_configuration.RedisAddr {
+	return zombie_configuration.RedisAddr(cfg.Redis)
+}
 
 var DistanceSet = wire.NewSet(distance.NewLocationsDistanceCalculator, distance.NewDriverLocationClient, wire.Bind(new(distance.LocationsGetter), distance.DriverLocationClient{}))
 

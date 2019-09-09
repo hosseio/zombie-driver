@@ -19,6 +19,7 @@ var HttpSet = wire.NewSet(
 	http.NewServer,
 	http.NewRouter,
 	http.NewZombieController,
+	http.NewConfigController,
 )
 
 var AppSet = wire.NewSet(
@@ -28,7 +29,21 @@ var AppSet = wire.NewSet(
 
 var ZombieConfigurationSet = wire.NewSet(
 	zombie_configuration.NewHardcodedZombieConfigGetter,
+	zombie_configuration.NewRedisZombieConfigurer,
 )
+
+func InitializeRedisZombieConfigurer(cfg Config) (zombie_configuration.RedisZombieConfigurer, error) {
+	wire.Build(
+		ZombieConfigurationSet,
+		getRedisAddr,
+	)
+
+	return zombie_configuration.RedisZombieConfigurer{}, nil
+}
+
+func getRedisAddr(cfg Config) zombie_configuration.RedisAddr {
+	return zombie_configuration.RedisAddr(cfg.Redis)
+}
 
 func InitializeHardcodedZombieConfigGetter(cfg Config) (zombie_configuration.HardcodedZombieConfigGetter, error) {
 	wire.Build(
@@ -51,8 +66,8 @@ func InitializeServer(cfg Config) (*netHttp.Server, error) {
 		serverAddr,
 		InitializeLocationsDistanceCalculator,
 		wire.Bind(new(driver_zombie.DistanceCalculator), distance.LocationsDistanceCalculator{}),
-		InitializeHardcodedZombieConfigGetter,
-		wire.Bind(new(driver_zombie.ZombieConfigGetter), zombie_configuration.HardcodedZombieConfigGetter{}),
+		InitializeRedisZombieConfigurer,
+		wire.Bind(new(driver_zombie.ZombieConfigurer), zombie_configuration.RedisZombieConfigurer{}),
 	)
 
 	return &netHttp.Server{}, nil

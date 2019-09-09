@@ -7,4 +7,5 @@ type Config struct {
 	DriverLocation struct {
 		BaseURL string `mapstructure:"base_url"`
 	} `mapstructure:"driver_location"`
+	Redis string `mapstructure:"redis"`
 }

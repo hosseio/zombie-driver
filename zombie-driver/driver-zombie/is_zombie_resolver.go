@@ -7,15 +7,18 @@ type IsZombieResolver interface {
 
 type DriverIsZombieResolver struct {
 	distanceCalculator DistanceCalculator
-	configGetter       ZombieConfigGetter
+	configGetter       ZombieConfigurer
 }
 
-func NewDriverIsZombieResolver(distanceCalculator DistanceCalculator, configGetter ZombieConfigGetter) DriverIsZombieResolver {
+func NewDriverIsZombieResolver(distanceCalculator DistanceCalculator, configGetter ZombieConfigurer) DriverIsZombieResolver {
 	return DriverIsZombieResolver{distanceCalculator, configGetter}
 }
 
 func (r DriverIsZombieResolver) Resolve(driverID string) bool {
-	config := r.configGetter.GetZombieConfig()
+	config, err := r.configGetter.GetZombieConfig()
+	if err != nil {
+		return false
+	}
 
 	distance, err := r.distanceCalculator.Calculate(driverID, config.LastMinutes)
 	if err != nil {

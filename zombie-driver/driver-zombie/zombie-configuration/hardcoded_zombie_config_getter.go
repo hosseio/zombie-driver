@@ -6,16 +6,20 @@ import (
 
 type HardcodedZombieConfigGetter struct{}
 
+const MaxMeters = 500
+const LastMinutes = 5
+
 func NewHardcodedZombieConfigGetter() HardcodedZombieConfigGetter {
 	return HardcodedZombieConfigGetter{}
 }
 
-const MaxMeters = 500
-const LastMinutes = 5
-
-func (HardcodedZombieConfigGetter) GetZombieConfig() driver_zombie.ZombieConfigProjection {
+func (HardcodedZombieConfigGetter) GetZombieConfig() (driver_zombie.ZombieConfigProjection, error) {
 	return driver_zombie.ZombieConfigProjection{
 		MaxMeters:   MaxMeters,
 		LastMinutes: LastMinutes,
-	}
+	}, nil
+}
+
+func (HardcodedZombieConfigGetter) SetZombieConfig(driver_zombie.ZombieConfigProjection) error {
+	return nil
 }
